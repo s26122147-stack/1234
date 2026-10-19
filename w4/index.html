@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>朋友對我的動態留言板 - 時尚精品風</title>
+  
+  <!-- 引進 Google Fonts (時尚高級感襯線體 Cormorant Garamond 與 內文 Noto Serif TC) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+TC:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       【自訂樣式變數區 - 方便後續修改顏色與輪播效果】
+       ========================================================================== */
+    :root {
+      /* --- 時尚奢華配色系 --- */
+      --bg-color: #f7f5f0;                /* 頁面底色：溫潤香檳奶白色 */
+      --card-bg: rgba(255, 255, 255, 0.85);/* 卡片背景：半透明法式純白 */
+      --card-border: rgba(212, 175, 55, 0.25); /* 預設細邊框：輕奢香檳金 */
+      
+      /* --- 時尚點綴色 (Highlight 輪播主角顏色) --- */
+      --accent-gold: #c5a059;             /* 高級金典顏色 */
+      --accent-glow: rgba(197, 160, 89, 0.35); /* 金色高光柔和暈暈 */
+      --accent-rose: #b85b56;             /* 輔助紅棕/玫瑰金 */
+      
+      /* --- 文字顏色 --- */
+      --text-primary: #1a1a1a;            /* 主標題/內文：經典曜石黑 */
+      --text-secondary: #706c61;          /* 次要文字/時間：優雅灰褐色 */
+      
+      /* --- 動態效能與過渡 --- */
+      --transition-speed: 0.6s;           /* 卡片切換 Highlight 的滑順時間 (秒) */
+    }
+
+    /* ==========================================================================
+       【全域基礎與背景設置】
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      /* 淡雅時尚微光漸層背景 */
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(228, 213, 183, 0.25) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(184, 91, 86, 0.1) 0px, transparent 50%);
+      color: var(--text-primary);
+      font-family: 'Noto Serif TC', serif;
+      min-height: 100vh;
+      padding: 3rem 1.5rem;
+      overflow-x: hidden;
+    }
+
+    /* 展覽風格頁面 Header */
+    .header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      position: relative;
+    }
+
+    .header-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--accent-gold);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .header h1 {
+      font-family: 'Cormorant Garamond', 'Noto Serif TC', serif;
+      font-size: 2.8rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      color: var(--text-primary);
+      position: relative;
+      display: inline-block;
+    }
+
+    /* 標題下方簡約優雅細線 */
+    .header h1::after {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 1px;
+      background: var(--accent-gold);
+      margin: 1rem auto 0;
+    }
+
+    /* 主要容器 */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       【時尚感『讀取中...』高級 Loading 動畫】
+       ========================================================================== */
+    .loading-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 0;
+    }
+
+    /* 高級珠寶/時鐘感鑽石旋轉圈 */
+    .fashion-spinner {
+      width: 50px;
+      height: 50px;
+      border: 1px solid rgba(197, 160, 89, 0.2);
+      border-top: 2px solid var(--accent-gold);
+      border-bottom: 2px solid var(--accent-rose);
+      border-radius: 50%;
+      animation: fashionSpin 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      margin-bottom: 1.5rem;
+    }
+
+    .loading-text {
+      font-family: 'Cormorant Garamond', 'Noto Serif TC', serif;
+      letter-spacing: 4px;
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      font-style: italic;
+      animation: fadeInOut 1.5s ease-in-out infinite;
+    }
+
+    @keyframes fashionSpin {
+      0% { transform: rotate(0deg) scale(0.95); }
+      50% { transform: rotate(180deg) scale(1.05); }
+      100% { transform: rotate(360deg) scale(0.95); }
+    }
+
+    @keyframes fadeInOut {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 1; }
+    }
+
+    /* ==========================================================================
+       【瀑布流排版 (Masonry Layout)】
+       ========================================================================== */
+    .masonry-wall {
+      /* CSS Column 高低錯落瀑布流 */
+      column-count: 3;             /* 預設大螢幕顯示 3 欄 */
+      column-gap: 2rem;           /* 欄位之間的間距 */
+      display: none;               /* 載入完成前先隱藏 */
+    }
+
+    /* 響應式斷點設定 */
+    @media (max-width: 900px) {
+      .masonry-wall { column-count: 2; }
+    }
+    @media (max-width: 600px) {
+      .masonry-wall { column-count: 1; }
+    }
+
+    /* ==========================================================================
+       【精品卡片設計 (Card Style)】
+       ========================================================================== */
+    .card {
+      break-inside: avoid;        /* 防止卡片被欄位裁切 split */
+      margin-bottom: 2rem;
+      background: var(--card-bg);
+      backdrop-filter: blur(10px); /* 輕法式霧面玻璃感 */
+      border: 1px solid var(--card-border);
+      border-radius: 4px;         /* 微圓角，保持硬朗時尚線條 */
+      padding: 1.8rem;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+      /* 輪播動畫平滑度 */
+      transition: all var(--transition-speed) cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    /* 卡片引號時尚裝飾 */
+    .card::before {
+      content: '“';
+      font-family: 'Cormorant Garamond', serif;
+      position: absolute;
+      top: 0.5rem;
+      right: 1.2rem;
+      font-size: 3.5rem;
+      color: rgba(197, 160, 89, 0.15);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* 卡片頭部 (名字與時間) */
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      padding-bottom: 0.6rem;
+    }
+
+    .card-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--text-primary);
+      letter-spacing: 1px;
+    }
+
+    .card-time {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* 卡片留言內容 */
+    .card-content {
+      font-size: 0.98rem;
+      line-height: 1.8;
+      color: #333333;
+      font-weight: 300;
+      white-space: pre-wrap;      /* 妥善保留換行 */
+      word-break: break-word;
+    }
+
+    /* ==========================================================================
+       【輪播 Highlight 特效 (核心動態狀態)】
+       ========================================================================== */
+
+    /* 1. 當卡片被輪播選中 (Highlight) 時的時尚亮起效果 */
+    .card.is-highlighted {
+      transform: translateY(-8px) scale(1.04);          /* 稍微優雅上浮與放大 */
+      border-color: var(--accent-gold);                 /* 邊框轉為香檳金 */
+      box-shadow: 
+        0 20px 40px var(--accent-glow),                 /* 金色奢華暈影 */
+        0 0 0 1px var(--accent-gold);                   /* 強化細框感 */
+      opacity: 1 !important;
+      filter: blur(0px) !important;
+      z-index: 10;
+    }
+
+    .card.is-highlighted .card-name {
+      color: var(--accent-gold);                        /* 名字轉為經典金 */
+    }
+
+    /* 2. 當有卡片亮起時，『其餘沒被選中』的卡片 (Dimmed) 特效 */
+    .masonry-wall.has-active-card .card:not(.is-highlighted) {
+      opacity: 0.3;                                     /* 降低透明度 */
+      filter: blur(1px);                                /* 柔和靜止微模糊 */
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 時尚展覽風 Header -->
+    <header class="header">
+      <div class="header-subtitle">EXHIBITION OF MEMORIES</div>
+      <h1>朋友對我的動態留言牆</h1>
+    </header>
+
+    <!-- 1. 載入中動畫區塊 -->
+    <div id="loading" class="loading-box">
+      <div class="fashion-spinner"></div>
+      <div class="loading-text">讀取留言中...</div>
+    </div>
+
+    <!-- 2. 留言牆主體 (瀑布流) -->
+    <main id="wall" class="masonry-wall"></main>
+  </div>
+
+  <script>
+    // ==========================================================================
+    // 【可供修改的全局參數設定】
+    // ==========================================================================
+    
+    // Google 試算表 CSV 發布網址
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRVz4T34j72FW9o2hIyLftCMsPaZIndu7sRSFzNaFpJXaiZu54YswRiVZdvtaYbWtoGHw_M7dRpKoHa/pub?output=csv';
+
+    /**
+     * 【重點】輪播切換間隔時間（單位：毫秒）
+     * 3000 代表 3 秒鐘。如需調整輪播速度，可直接修改此數值 (例如：5000 代表 5 秒)。
+     */
+    const CAROUSEL_INTERVAL_MS = 3000;
+
+    // 全局控制變數
+    let messagesData = [];     // 解析後的留言資料陣列
+    let currentCardIndex = -1; // 目前正處於 Highlight 的卡片索引
+    let carouselTimer = null;  // setInterval 計時器
+
+    // ==========================================================================
+    // 【CSV 解析邏輯 (能妥善處理包含逗號與換行符號的留言)】
+    // ==========================================================================
+    function parseCSV(text) {
+      const result = [];
+      let row = [];
+      let entry = '';
+      let insideQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const nextC = text[i + 1];
+
+        if (c === '"') {
+          if (insideQuotes && nextC === '"') {
+            entry += '"'; // 雙重引號轉義處理
+            i++;
+          } else {
+            insideQuotes = !insideQuotes; // 切換雙引號引號狀態
+          }
+        } else if (c === ',' && !insideQuotes) {
+          row.push(entry.trim());
+          entry = '';
+        } else if ((c === '\r' || c === '\n') && !insideQuotes) {
+          if (c === '\r' && nextC === '\n') { i++; }
+          row.push(entry.trim());
+          if (row.some(field => field !== '')) {
+            result.push(row);
+          }
+          row = [];
+          entry = '';
+        } else {
+          entry += c;
+        }
+      }
+      if (entry || row.length > 0) {
+        row.push(entry.trim());
+        result.push(row);
+      }
+      return result;
+    }
+
+    // XSS 安全防護：過濾 HTML 特殊字元防止注入攻擊
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // ==========================================================================
+    // 【資料串接與 DOM 生成】
+    // ==========================================================================
+    
+    async function fetchMessages() {
+      const loadingEl = document.getElementById('loading');
+      const wallEl = document.getElementById('wall');
+
+      try {
+        const response = await fetch(CSV_URL);
+        if (!response.ok) throw new Error('無法連線至資料來源');
+        
+        const csvText = await response.text();
+        const parsedRows = parseCSV(csvText);
+
+        // 預設 CSV 欄位順序：0:時間戳記, 1:名字, 2:悄悄話 (跳過第一列 Header)
+        const rowsData = parsedRows.slice(1);
+
+        messagesData = rowsData.map(row => ({
+          timestamp: row[0] || '',
+          name: row[1] || '匿名朋友',
+          content: row[2] || '(未填寫留言)'
+        })).filter(item => item.name !== '匿名朋友' || item.content !== '(未填寫留言)'); // 移除無效留言
+
+        // 隱藏 Loading 動畫，顯示瀑布流主牆
+        loadingEl.style.display = 'none';
+        wallEl.style.display = 'block';
+
+        // 動態生成留言卡片
+        renderCards(messagesData);
+
+        // 啟動時尚輪播 Highlight 特效
+        if (messagesData.length > 0) {
+          startCarousel();
+        }
+
+      } catch (error) {
+        console.error('讀取 CSV 發生錯誤:', error);
+        loadingEl.innerHTML = `
+          <div style="color: var(--accent-rose); text-align: center;">
+            <p style="font-family: 'Cormorant Garamond', serif; font-size: 1.3rem;">Unable to load messages.</p>
+            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 5px;">${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // 動態卡片渲染
+    function renderCards(data) {
+      const wallEl = document.getElementById('wall');
+      wallEl.innerHTML = '';
+
+      data.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.setAttribute('data-index', index);
+
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="card-name">${escapeHTML(item.name)}</span>
+            <span class="card-time">${escapeHTML(item.timestamp)}</span>
+          </div>
+          <div class="card-content">${escapeHTML(item.content)}</div>
+        `;
+
+        wallEl.appendChild(card);
+      });
+    }
+
+    // ==========================================================================
+    // 【隨時間輪播亮起 (Highlight) 核心邏輯】
+    // ==========================================================================
+    
+    function startCarousel() {
+      const cards = document.querySelectorAll('.card');
+      const wallEl = document.getElementById('wall');
+
+      if (cards.length === 0) return;
+
+      // 為牆面添加 Class，讓「未選中的卡片」套用變暗與微模糊效果
+      wallEl.classList.add('has-active-card');
+
+      // 立即展示第一張亮起
+      highlightNextCard(cards);
+
+      // 設定每隔 CAROUSEL_INTERVAL_MS 秒切換一次
+      carouselTimer = setInterval(() => {
+        highlightNextCard(cards);
+      }, CAROUSEL_INTERVAL_MS);
+    }
+
+    function highlightNextCard(cards) {
+      // 1. 移除上一次被 Highlight 的卡片狀態
+      if (currentCardIndex >= 0 && cards[currentCardIndex]) {
+        cards[currentCardIndex].classList.remove('is-highlighted');
+      }
+
+      // 2. 算下一張卡片索引 (循環輪播)
+      currentCardIndex = (currentCardIndex + 1) % cards.length;
+
+      // 3. 為當前卡片加上 .is-highlighted 樣式
+      const activeCard = cards[currentCardIndex];
+      activeCard.classList.add('is-highlighted');
+
+      // 4. 滾動視窗讓 Highlight 卡片始終保持在最佳視區
+      activeCard.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+      });
+    }
+
+    // 當 DOM 載入後自動執行
+    document.addEventListener('DOMContentLoaded', fetchMessages);
+  </script>
+</body>
+</html>
