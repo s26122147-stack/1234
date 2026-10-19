@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>甜心程式設計師的作品集 Portfolio</title>
+    <!-- 導入可愛圓體字型與 FontAwesome 圖示 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #ffd1dc 0%, #ffe4e1 35%, #e6e6fa 70%, #d8bfd8 100%);
+            --pink-primary: #ff8da1;
+            --pink-secondary: #ffb6c1;
+            --purple-accent: #b19ffb;
+            --cream-bg: #fffbf7;
+            --text-color: #6b4e71;
+            --locked-bg: #e2d9e2;
+            --locked-text: #a092a0;
+            --card-shadow: 0 15px 35px rgba(238, 174, 202, 0.4);
+            --glow-light: 0 0 20px rgba(255, 182, 193, 0.8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Zen Maru Gothic', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 2rem 1rem;
+            color: var(--text-color);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 漂浮氣泡背景 */
+        .bg-decorations {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-bubble {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.45);
+            border-radius: 50%;
+            animation: floatUp 8s infinite linear;
+            backdrop-filter: blur(2px);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 960px;
+            background: rgba(255, 251, 247, 0.85);
+            backdrop-filter: blur(12px);
+            border: 4px solid #ffffff;
+            border-radius: 35px;
+            padding: 2.5rem 1.5rem;
+            box-shadow: var(--card-shadow);
+            z-index: 1;
+            position: relative;
+            margin: auto;
+        }
+
+        .profile-section {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 1.2rem;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #ffffff;
+            box-shadow: 0 8px 25px rgba(255, 141, 161, 0.5);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .avatar-wrapper:hover .avatar-img {
+            transform: scale(1.08) rotate(5deg);
+        }
+
+        .avatar-wrapper::after {
+            content: '✨';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 1.8rem;
+            animation: pulseStar 2s infinite alternate;
+        }
+
+        @keyframes pulseStar {
+            0% { transform: scale(0.8) rotate(-10deg); }
+            100% { transform: scale(1.2) rotate(15deg); }
+        }
+
+        .profile-name {
+            font-family: 'Mochiy Pop One', sans-serif;
+            font-size: 1.8rem;
+            color: var(--pink-primary);
+            text-shadow: 2px 2px 0px #ffffff, 4px 4px 10px rgba(255, 141, 161, 0.3);
+            margin-bottom: 0.6rem;
+            letter-spacing: 1px;
+        }
+
+        .profile-subtitle {
+            font-size: 0.95rem;
+            color: #8c6d93;
+            background: #f4e8f7;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
+            font-weight: 700;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2rem;
+            width: 100%;
+        }
+
+        @media (max-width: 850px) {
+            .portfolio-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 580px) {
+            .portfolio-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.9rem;
+            }
+            .container {
+                padding: 1.8rem 1rem;
+                border-radius: 25px;
+            }
+            .profile-name {
+                font-size: 1.5rem;
+            }
+        }
+
+        .card-btn {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 115px;
+            padding: 1rem 0.8rem;
+            border-radius: 22px;
+            text-decoration: none;
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            overflow: hidden;
+            border: 3px solid transparent;
+        }
+
+        .card-badge {
+            font-size: 0.75rem;
+            font-weight: 900;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            margin-bottom: 0.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* 已解鎖按鈕效果 */
+        .card-btn.unlocked {
+            background: linear-gradient(145deg, #ffffff 0%, #fff0f3 100%);
+            border-color: #ffd6e0;
+            box-shadow: 0 8px 18px rgba(255, 182, 193, 0.35);
+            color: #5c3c61;
+            cursor: pointer;
+        }
+
+        .card-btn.unlocked .card-badge {
+            background: var(--pink-primary);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(255, 141, 161, 0.4);
+        }
+
+        .card-btn.unlocked:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: var(--pink-primary);
+            box-shadow: 0 15px 28px rgba(255, 141, 161, 0.5), var(--glow-light);
+            background: linear-gradient(145deg, #ffffff 0%, #ffe3e8 100%);
+        }
+
+        .card-btn.unlocked::before {
+            content: '⭐';
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            font-size: 0.85rem;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .card-btn.unlocked:hover::before {
+            opacity: 1;
+            transform: rotate(20deg) scale(1.2);
+        }
+
+        /* 鎖定中按鈕效果 */
+        .card-btn.locked {
+            background: var(--locked-bg);
+            color: var(--locked-text);
+            border-color: #d3c4d3;
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
+        .card-btn.locked .card-badge {
+            background: #c3b5c3;
+            color: #ffffff;
+        }
+
+        .card-icon {
+            font-size: 1.3rem;
+            margin-top: 0.3rem;
+            transition: transform 0.2s ease;
+        }
+
+        .card-btn.locked:hover {
+            animation: lockShake 0.4s ease-in-out;
+            background: #dad0da;
+            border-color: #bfa8bf;
+        }
+
+        .card-btn.locked:hover .card-icon {
+            transform: scale(1.25) rotate(-10deg);
+            color: #836783;
+        }
+
+        @keyframes lockShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px) rotate(-3deg); }
+            40% { transform: translateX(6px) rotate(3deg); }
+            60% { transform: translateX(-4px) rotate(-1.5deg); }
+            80% { transform: translateX(4px) rotate(1.5deg); }
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.88rem;
+            color: #8c6d93;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .footer-note i {
+            color: var(--pink-primary);
+        }
+
+        /* 彈窗提示 (Toast) */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #6b4e71;
+            color: #fff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 漂浮氣泡裝飾 -->
+    <div class="bg-decorations" id="bubbleContainer"></div>
+
+    <main class="container">
+        <section class="profile-section">
+            <div class="avatar-wrapper">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="大頭貼" class="avatar-img">
+            </div>
+            <h1 class="profile-name">甜心程式設計師的作品集 Portfolio 🎀</h1>
+            <p class="profile-subtitle"><i class="fa-solid fa-sparkles"></i> 網頁程式設計學習闖關單元 <i class="fa-solid fa-heart"></i></p>
+        </section>
+
+        <section class="portfolio-grid">
+            <!-- Week 1 按鈕 (已解鎖) -->
+            <a href="w1/index.html" class="card-btn unlocked">
+                <span class="card-badge">OPEN</span>
+                <span class="card-title">Week 1<br>數位名片</span>
+            </a>
+
+            <!-- Week 2 按鈕 (已解鎖) -->
+            <a href="w2/index.html" class="card-btn unlocked">
+                <span class="card-badge">OPEN</span>
+                <span class="card-title">Week 2<br>今天吃甚麼?</span>
+            </a>
+
+            <!-- Week 3 按鈕 (未解鎖) -->
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 3')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 3<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <!-- Week 4 按鈕 (已解鎖：悄悄話) -->
+            <a href="w4/index.html" class="card-btn unlocked">
+                <span class="card-badge">OPEN</span>
+                <span class="card-title">Week 4<br>悄悄話 💬</span>
+            </a>
+
+            <!-- Week 5 ~ Week 16 按鈕 (未解鎖) -->
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 5')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 5<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 6')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 6<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 7')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 7<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 8')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 8<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 9')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 9<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 10')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 10<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 11')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 11<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 12')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 12<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 13')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 13<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 14')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 14<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 15')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 15<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+
+            <a href="javascript:void(0)" class="card-btn locked" onclick="showLockedToast('Week 16')">
+                <span class="card-badge">LOCK</span>
+                <span class="card-title">Week 16<br>鎖定中 🔒</span>
+                <i class="fa-solid fa-lock card-icon"></i>
+            </a>
+        </section>
+
+        <footer class="footer-note">
+            <i class="fa-solid fa-heart"></i>
+            <span>KEEP GOING & UNLOCK ALL QUESTS!</span>
+            <i class="fa-solid fa-heart"></i>
+        </footer>
+    </main>
+
+    <!-- Toast 提示 -->
+    <div id="toast" class="toast">🔒 關卡尚未解鎖，敬請期待！</div>
+
+    <script>
+        // 生成漂浮氣泡
+        function createBubbles() {
+            const container = document.getElementById('bubbleContainer');
+            const bubbleCount = 12;
+
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('floating-bubble');
+                const size = Math.random() * 35 + 15;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${Math.random() * 100}%`;
+                bubble.style.animationDuration = `${Math.random() * 6 + 6}s`;
+                bubble.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(bubble);
+            }
+        }
+
+        // 點擊未解鎖卡片的彈窗提示
+        let toastTimer;
+        function showLockedToast(weekName) {
+            const toast = document.getElementById('toast');
+            toast.innerText = `🔒 ${weekName} 尚未解鎖，繼續加油完成任務吧！`;
+            toast.classList.add('show');
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        window.onload = function() {
+            createBubbles();
+        };
+    </script>
+</body>
+</html>
